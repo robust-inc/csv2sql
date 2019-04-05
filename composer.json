@@ -1,0 +1,33 @@
+{
+    "name": "robust-inc/csv2sql",
+    "type": "library",
+    "description": "Convert CSV to SQL with create table statements.",
+    "keywords": ["csv","sql"],
+    "authors": [
+        {
+            "name": "yoshiyuki ohde",
+            "email": "y_ohde@robust-inc.com"
+        }
+    ],
+    "license": "MIT",
+    "homepage": "https://www.robust-inc.com/",
+    "require": {
+        "league/csv": "^9.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "RobustInc\\Csv2Sql\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": [
+            "vendor/bin/phpunit --testsuite test"
+        ]
+    },
+   "bin": [
+        "csv2Sql"
+    ]
+}

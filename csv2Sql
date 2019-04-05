@@ -1,0 +1,65 @@
+#!/usr/bin/env php
+<?php
+
+// require autoload file
+$autoloads = [__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php'];
+foreach ($autoloads as $file) {
+  if (file_exists($file)) {
+    define('CSV2SQL_COMPOSER_INSTALL', $file);
+    break;
+  }
+}
+require CSV2SQL_COMPOSER_INSTALL;
+
+// Check command line arguments
+// 1. インプットCSVファイル名(必須):--in test.csv
+// 2. 出力ファイル名（任意、無いときは標準出力）-out test.sql
+// 3. データベース名(任意、無いときはuse文無し): -d mydb
+// 4. テーブル名(必須): -t mytable
+// 5. １行目にヘッダ行があるか？(任意): --with-header
+
+$argv_conf = [
+  '-in' => "input_filename",
+  '-out' => "output_filename",
+  '-d' => "database",
+  '-t' => "table",
+  '--with-header' => "with_header",
+];
+
+$my_args = [];
+
+foreach ($argv_conf as $value) {
+  $my_args[$value] = null;
+}
+
+foreach ($argv as $key => $value) {
+  if($key==0) continue;
+  if (isset($argv_conf[$value])){
+    $my_args[$argv_conf[$value]] = isset($argv[$key+1]) ? $argv[$key+1] : "no_value";
+  }
+}
+
+extract($my_args);
+
+$input_filename = is_null($input_filename) ? false : __DIR__.'/'.$input_filename;
+$output_filename = is_null($output_filename) ? false : $output_filename;
+$database = is_null($database) ? false : $database;
+$table = is_null($table) ? false : $table;
+$with_header = is_null($with_header) ? false : true;
+
+if($input_filename==false || $input_filename=='no_value' || !file_exists($input_filename)){
+  echo "Input Filename is invalid. : -in input_filename".PHP_EOL;
+  exit(1);
+}
+if($table==false || $table=='no_value'){
+  echo "Table Name is required. : -t mytable".PHP_EOL;
+  exit(1);
+}
+
+$csv2sql = new RobustInc\Csv2Sql\Csv2Sql($table,$database==false ? "" : $database);
+$sql_str = $csv2sql->convertToSql($input_filename,$with_header);
+if($output_filename){
+  file_put_contents($output_filename, $sql_str);
+}else{
+  echo $sql_str;
+}
